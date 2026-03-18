@@ -4,6 +4,8 @@ An interactive terminal color editor. Copy a CSS color to your clipboard, run
 `colr`, and adjust it in real time — then copy the result back out in any
 format.
 
+![screenshot](./docs/screenshot.png)
+
 ## Usage
 
 Copy a CSS color to your clipboard, then:
