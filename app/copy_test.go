@@ -160,6 +160,22 @@ func TestHelpQClosesHelpNotApp(t *testing.T) {
 	}
 }
 
+func TestYYCopiesRGB(t *testing.T) {
+	m := newTestModel(color.Color{R: 255, G: 0, B: 0, A: 1})
+
+	result, _ := handleKeyMsg(m, "y")
+	updated := result.(Model)
+	result2, cmd := handleKeyMsg(updated, "y")
+	updated2 := result2.(Model)
+
+	if !strings.Contains(updated2.toastMessage, "RGB") {
+		t.Errorf("expected RGB toast from yy, got %q", updated2.toastMessage)
+	}
+	if cmd == nil {
+		t.Error("expected tick cmd from yy")
+	}
+}
+
 func TestHelpBlocksOtherKeys(t *testing.T) {
 	m := newTestModel(color.Color{R: 255, G: 0, B: 0, A: 1})
 	m.showHelp = true

@@ -58,9 +58,16 @@ var (
 	OutputKeyStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("39"))
 
+	// Slider
+	SliderStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("240"))
+
 	// Footer
 	FooterStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("240"))
+
+	FooterKeyStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("39"))
 
 	FooterSepStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("237"))

@@ -37,7 +37,6 @@ func RenderOutputs(c color.Color, width int) string {
 	var lines []string
 	for _, r := range rows {
 		label := OutputLabelStyle.Width(labelW).Render(r.label)
-		// Width() on value pads/clips to exactly valueW visual chars — no manual spacing needed.
 		value := lipgloss.NewStyle().
 			Foreground(lipgloss.Color("255")).
 			Width(valueW).

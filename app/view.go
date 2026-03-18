@@ -1,6 +1,8 @@
 package app
 
 import (
+	"strings"
+
 	"github.com/charmbracelet/lipgloss"
 
 	"github.com/elentok/colr/color"
@@ -86,10 +88,18 @@ func (m Model) View() string {
 		Width(innerW).
 		Height(m.height - 2).
 		Render(body)
+	// Inject "colr" into the top border line after rendering.
+	frame = injectBorderTitle(frame)
 
 	if m.showHelp {
 		return ui.RenderHelp(m.width, m.height)
 	}
 
 	return frame
+}
+
+// injectBorderTitle replaces "╭──────" with "╭ colr " in the rendered frame,
+// embedding the app name in the top border line without changing visual width.
+func injectBorderTitle(s string) string {
+	return strings.Replace(s, "╭──────", "╭ colr ", 1)
 }

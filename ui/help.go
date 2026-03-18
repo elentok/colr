@@ -45,7 +45,7 @@ func RenderHelp(width, height int) string {
 	content += "\n"
 
 	content += helpSectionStyle.Render("Copy") + "\n"
-	content += helpRow("yr", "copy RGB")
+	content += helpRow("yr / yy", "copy RGB")
 	content += helpRow("yx", "copy HEX")
 	content += helpRow("yh", "copy HSL")
 	content += "\n"

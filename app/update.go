@@ -65,6 +65,8 @@ func handleEditKey(m Model, key string) (Model, tea.Cmd) {
 			return applyCopy(m, "hex")
 		case "h":
 			return applyCopy(m, "hsl")
+		case "y":
+			return applyCopy(m, "rgb")
 		}
 		// Unknown key after y — no action, pendingY already cleared.
 		return m, nil

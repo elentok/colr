@@ -19,31 +19,30 @@ func RenderPreview(c color.Color, width, height int) string {
 	b := float64(c.B) / 255.0
 	luminance := 0.2126*r + 0.7152*g + 0.0722*b
 	fgSuggestion := "white"
+	fgANSI := lipgloss.Color("255")
 	if luminance > 0.5 {
 		fgSuggestion = "black"
+		fgANSI = lipgloss.Color("0")
 	}
 
-	// Build the preview rows.
-	// If alpha < 1.0, alternate rows between the color and a checkerboard hint.
 	hasAlpha := c.A < 0.999
 
 	var rows []string
-	previewRows := height - 2 // leave room for the fg hint line
+	previewRows := height - 1 // leave room for the fg hint line
 	if previewRows < 1 {
 		previewRows = 1
 	}
 
 	colorStyle := lipgloss.NewStyle().Background(lipgloss.Color(hexColor))
-	// A neutral dark/light checker background to contrast with the color.
 	checkerDarkStyle := lipgloss.NewStyle().Background(lipgloss.Color("236"))
 	checkerLightStyle := lipgloss.NewStyle().Background(lipgloss.Color("250"))
 
+	blockW := 2
 	line := strings.Repeat(" ", width)
 
 	for i := range previewRows {
-		if hasAlpha && i%2 == 1 {
-			// Alternate row: split into checker blocks to hint at transparency.
-			blockW := 2
+		if hasAlpha {
+			// Per-cell compositing: alternate color/checker blocks within each row.
 			var cells []string
 			col := 0
 			for col < width {
@@ -52,11 +51,16 @@ func RenderPreview(c color.Color, width, height int) string {
 					end = width
 				}
 				chunk := strings.Repeat(" ", end-col)
+				// Alternate between color and checker based on position + row parity.
 				block := (col/blockW + i) % 2
 				if block == 0 {
-					cells = append(cells, checkerDarkStyle.Render(chunk))
+					cells = append(cells, colorStyle.Render(chunk))
 				} else {
-					cells = append(cells, checkerLightStyle.Render(chunk))
+					if (i/2)%2 == 0 {
+						cells = append(cells, checkerDarkStyle.Render(chunk))
+					} else {
+						cells = append(cells, checkerLightStyle.Render(chunk))
+					}
 				}
 				col = end
 			}
@@ -66,12 +70,16 @@ func RenderPreview(c color.Color, width, height int) string {
 		}
 	}
 
-	// Foreground hint line at bottom of preview.
+	// Foreground hint line at bottom: styled with actual fg/bg colors.
 	fgHint := fmt.Sprintf("Foreground: %s", fgSuggestion)
 	if hasAlpha {
-		fgHint += "  (transparent)"
+		fgHint += " (transparent)"
 	}
-	rows = append(rows, fgHint)
+	hintStyle := lipgloss.NewStyle().
+		Foreground(fgANSI).
+		Background(lipgloss.Color(hexColor)).
+		Width(width)
+	rows = append(rows, hintStyle.Render(fgHint))
 
 	return strings.Join(rows, "\n")
 }
