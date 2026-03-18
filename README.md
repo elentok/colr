@@ -60,11 +60,20 @@ Alpha is omitted when 100%, included as an integer percentage otherwise.
 
 ## Installation
 
+**Homebrew (macOS / Linux):**
+
+```sh
+brew tap elentok/stuff
+brew install --cask elentok/stuff/colr
+```
+
+**Go:**
+
 ```sh
 go install github.com/elentok/colr@latest
 ```
 
-Or build from source:
+**Build from source:**
 
 ```sh
 git clone https://github.com/elentok/colr
