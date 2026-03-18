@@ -44,7 +44,7 @@ func (m Model) View() string {
 		innerW,
 	)
 	preview := ui.RenderPreview(m.currentColor, previewW-2, splitContentH)
-	editor := ui.RenderEditor(m.currentColor, m.editMode, m.selectedField, editorW-2)
+	editor := ui.RenderEditor(m.currentColor, m.editMode, m.selectedField, m.lastHue, editorW-2)
 	// outputsPanel content width = innerW-2 (NormalBorder takes 1 per side).
 	outputs := ui.RenderOutputs(m.currentColor, innerW-2)
 	footer := ui.RenderFooter(innerW)

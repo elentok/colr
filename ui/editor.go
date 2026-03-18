@@ -9,20 +9,26 @@ import (
 )
 
 // RenderEditor renders the editor pane showing adjustable fields.
-func RenderEditor(c color.Color, mode EditMode, selectedField int, width int) string {
+// lastHue is the preserved hue used when saturation is 0 (grayscale stability).
+func RenderEditor(c color.Color, mode EditMode, selectedField int, lastHue float64, width int) string {
 	var lines []string
 
 	if mode == ModeHSV {
 		lines = append(lines, ModeTitleStyle.Render("Edit Mode: HSV"))
 		lines = append(lines, "")
 		hsv := color.RGBToHSV(c)
+		// Use lastHue when achromatic so the hue display doesn't snap to 0.
+		displayHue := hsv.H
+		if hsv.S == 0 {
+			displayHue = lastHue
+		}
 		opacity := int(math.Round(c.A * 100))
 		fields := []struct {
 			label string
 			value string
 			idx   int
 		}{
-			{"Hue", fmt.Sprintf("%d°", int(math.Round(hsv.H))), FieldHue},
+			{"Hue", fmt.Sprintf("%d°", int(math.Round(displayHue))), FieldHue},
 			{"Saturation", fmt.Sprintf("%d%%", int(math.Round(hsv.S*100))), FieldSaturation},
 			{"Value", fmt.Sprintf("%d%%", int(math.Round(hsv.V*100))), FieldValue},
 			{"Opacity", fmt.Sprintf("%d%%", opacity), FieldOpacity},

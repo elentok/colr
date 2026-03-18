@@ -18,6 +18,7 @@ type Model struct {
 	currentColor  color.Color
 	editMode      EditMode
 	selectedField int
+	lastHue       float64 // preserved hue for grayscale stability
 	toastMessage  string
 	toastExpiry   time.Time
 	width         int
@@ -27,12 +28,14 @@ type Model struct {
 
 // NewModel creates a new Model from parsed clipboard input.
 func NewModel(clipText string, c color.Color) Model {
+	hsv := color.RGBToHSV(c)
 	return Model{
 		originalClip:  clipText,
 		originalColor: c,
 		currentColor:  c,
 		editMode:      ModeHSV,
 		selectedField: 0,
+		lastHue:       hsv.H,
 		width:         80,
 		height:        24,
 	}
