@@ -3,20 +3,32 @@ package app
 import (
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 
 	"github.com/elentok/colr/color"
 	"github.com/elentok/colr/ui"
 )
 
-func (m Model) View() string {
+func (m Model) View() tea.View {
+	v := tea.NewView(m.render())
+	v.AltScreen = true
+	return v
+}
+
+func (m Model) render() string {
 	if m.width == 0 {
 		return ""
 	}
 
-	// Width: outer border takes 1 col per side = 2 total.
+	if m.showHelp {
+		return ui.RenderHelp(m.width, m.height)
+	}
+
+	// In lipgloss v2, Width() is the total outer width (border included).
+	// outerW = full terminal width; innerW = content width inside outer border.
 	outerW := m.width
-	innerW := outerW - 2
+	innerW := outerW - 2 // content width inside the outer rounded border
 
 	// Height budget (all rows that aren't the split panels):
 	//   outer border:    2  (top + bottom)
@@ -34,11 +46,12 @@ func (m Model) View() string {
 	}
 	splitContentH := splitPanelH - 2 // content height passed to Height()
 
-	// Split widths: preview ~40%, editor ~60%.
+	// Split widths (total including each panel's NormalBorder):
+	// previewW + editorW = innerW; each panel's Width() is its total outer width.
 	previewW := innerW * 40 / 100
 	editorW := innerW - previewW
 
-	// Render each region.
+	// Render each region (pass content widths = total - 2 for border).
 	header := ui.RenderHeader(
 		m.originalClip,
 		color.FormatRGB(m.currentColor),
@@ -52,18 +65,19 @@ func (m Model) View() string {
 	footer := ui.RenderFooter(innerW)
 
 	// Assemble panels.
+	// Width() = total outer width (lipgloss v2 includes borders in the count).
 	previewPanel := lipgloss.NewStyle().
 		Border(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("240")).
-		Width(previewW - 2).
-		Height(splitContentH).
+		Width(previewW).
+		Height(splitContentH + 2).
 		Render(preview)
 
 	editorPanel := lipgloss.NewStyle().
 		Border(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("240")).
-		Width(editorW - 2).
-		Height(splitContentH).
+		Width(editorW).
+		Height(splitContentH + 2).
 		Render(editor)
 
 	splitRow := lipgloss.JoinHorizontal(lipgloss.Top, previewPanel, editorPanel)
@@ -71,7 +85,7 @@ func (m Model) View() string {
 	outputsPanel := lipgloss.NewStyle().
 		Border(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("240")).
-		Width(innerW - 2).
+		Width(innerW).
 		Render(outputs)
 
 	body := lipgloss.JoinVertical(lipgloss.Left,
@@ -81,19 +95,15 @@ func (m Model) View() string {
 		footer,
 	)
 
-	// Outer frame: Height(m.height-2) so the border fills exactly m.height rows.
+	// Outer frame: Width/Height = total outer dimensions.
 	frame := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color("39")).
-		Width(innerW).
-		Height(m.height - 2).
+		Width(outerW).
+		Height(m.height).
 		Render(body)
 	// Inject "colr" into the top border line after rendering.
 	frame = injectBorderTitle(frame)
-
-	if m.showHelp {
-		return ui.RenderHelp(m.width, m.height)
-	}
 
 	return frame
 }

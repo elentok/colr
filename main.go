@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 
 	"github.com/elentok/colr/app"
 	"github.com/elentok/colr/clipboard"
@@ -26,7 +26,7 @@ func main() {
 	}
 
 	model := app.NewModel(clipText, c)
-	p := tea.NewProgram(model, tea.WithAltScreen())
+	p := tea.NewProgram(model)
 	if _, err := p.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, "colr:", err)
 		os.Exit(1)
