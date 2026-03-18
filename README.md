@@ -6,6 +6,10 @@ format.
 
 ![screenshot](./docs/screenshot.png)
 
+## Disclaimer
+
+I wrote this with the help of Claude Code and Codex (see docs/prompts).
+
 ## Usage
 
 Copy a CSS color to your clipboard, then:
