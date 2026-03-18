@@ -24,6 +24,7 @@ type Model struct {
 	width         int
 	height        int
 	showHelp      bool
+	pendingY      bool
 }
 
 // NewModel creates a new Model from parsed clipboard input.

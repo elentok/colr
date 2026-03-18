@@ -80,10 +80,16 @@ func (m Model) View() string {
 	)
 
 	// Outer frame: Height(m.height-2) so the border fills exactly m.height rows.
-	return lipgloss.NewStyle().
+	frame := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color("39")).
 		Width(innerW).
 		Height(m.height - 2).
 		Render(body)
+
+	if m.showHelp {
+		return ui.RenderHelp(m.width, m.height)
+	}
+
+	return frame
 }
