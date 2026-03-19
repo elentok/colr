@@ -14,6 +14,8 @@ func RenderOutputs(c color.Color, width int) string {
 	hex := color.FormatHEX(c)
 	hsl := color.FormatHSL(c)
 
+	name := color.NearestNamedColor(c)
+
 	rows := []struct {
 		label string
 		value string
@@ -22,6 +24,7 @@ func RenderOutputs(c color.Color, width int) string {
 		{"RGB", rgb, "[yr]"},
 		{"HEX", hex, "[yx]"},
 		{"HSL", hsl, "[yh]"},
+		{"NAME", name, "[yn]"},
 	}
 
 	// Line structure: "  " + label(6) + "  " + value(fill) + "  " + key(4)

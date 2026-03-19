@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	tea "charm.land/bubbletea/v2"
@@ -24,6 +25,9 @@ func applyCopy(m Model, format string) (Model, tea.Cmd) {
 	case "hsl":
 		text = color.FormatHSL(m.currentColor)
 		label = "HSL"
+	case "name":
+		text = strings.TrimPrefix(color.NearestNamedColor(m.currentColor), "~")
+		label = "Name"
 	}
 
 	err := clipboard.Write(text)

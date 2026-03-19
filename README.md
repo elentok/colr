@@ -44,6 +44,7 @@ quit with `q`.
 | `yr` / `yy`    | Copy RGB to clipboard     |
 | `yx`           | Copy HEX to clipboard     |
 | `yh`           | Copy HSL to clipboard     |
+| `yn`           | Copy CSS name to clipboard |
 | `R`            | Reset to original color   |
 | `?`            | Help overlay              |
 | `q` / `ctrl+c` | Quit                      |

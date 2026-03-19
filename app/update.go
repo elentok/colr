@@ -65,6 +65,8 @@ func handleEditKey(m Model, key string) (Model, tea.Cmd) {
 			return applyCopy(m, "hex")
 		case "h":
 			return applyCopy(m, "hsl")
+		case "n":
+			return applyCopy(m, "name")
 		case "y":
 			return applyCopy(m, "rgb")
 		}
