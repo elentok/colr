@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	tea "charm.land/bubbletea/v2"
 
@@ -11,8 +12,16 @@ import (
 	"github.com/elentok/colr/color"
 )
 
+func resolveInput(args []string, readClipboard func() (string, error)) (string, error) {
+	if len(args) > 1 {
+		return strings.Join(args[1:], " "), nil
+	}
+
+	return readClipboard()
+}
+
 func main() {
-	clipText, err := clipboard.Read()
+	clipText, err := resolveInput(os.Args, clipboard.Read)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "colr: failed to read clipboard")
 		os.Exit(1)

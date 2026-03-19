@@ -18,6 +18,13 @@ Copy a CSS color to your clipboard, then:
 colr
 ```
 
+Or pass a color directly:
+
+```sh
+colr "#ff8000"
+colr 255 128 0
+```
+
 The app reads your clipboard on launch and opens a TUI showing a live preview,
 an editor, and output formats. When you're done, copy the result with `yr`,
 `yx`, or `yh` and quit with `q`.
