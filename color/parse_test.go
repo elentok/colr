@@ -214,8 +214,8 @@ func TestParseInvalid(t *testing.T) {
 		"hsl(20 30)",
 		"",
 		"not a color",
-		"#12345",  // 5 hex digits
-		"#1234567", // 7 hex digits
+		"#12345",          // 5 hex digits
+		"#1234567",        // 7 hex digits
 		"rgba(255, 0, 0)", // rgba missing alpha
 	}
 	for _, input := range invalid {
@@ -225,5 +225,55 @@ func TestParseInvalid(t *testing.T) {
 				t.Errorf("Parse(%q) expected error, got none", input)
 			}
 		})
+	}
+}
+
+func TestFindFirstParsesWholeInput(t *testing.T) {
+	got, err := FindFirst("  #FF0000;  ")
+	if err != nil {
+		t.Fatalf("FindFirst returned error: %v", err)
+	}
+	if got != (Color{255, 0, 0, 1.0}) {
+		t.Fatalf("FindFirst returned %+v, want %+v", got, Color{255, 0, 0, 1.0})
+	}
+}
+
+func TestFindFirstExtractsEmbeddedHEX(t *testing.T) {
+	got, err := FindFirst("primary color: #FF8000; background later")
+	if err != nil {
+		t.Fatalf("FindFirst returned error: %v", err)
+	}
+	if got != (Color{255, 128, 0, 1.0}) {
+		t.Fatalf("FindFirst returned %+v, want %+v", got, Color{255, 128, 0, 1.0})
+	}
+}
+
+func TestFindFirstExtractsEmbeddedRGB(t *testing.T) {
+	got, err := FindFirst("theme uses rgb(255 0 0) for accents")
+	if err != nil {
+		t.Fatalf("FindFirst returned error: %v", err)
+	}
+	if got != (Color{255, 0, 0, 1.0}) {
+		t.Fatalf("FindFirst returned %+v, want %+v", got, Color{255, 0, 0, 1.0})
+	}
+}
+
+func TestFindFirstExtractsBareValues(t *testing.T) {
+	got, err := FindFirst("accent is 255 128 0 right now")
+	if err != nil {
+		t.Fatalf("FindFirst returned error: %v", err)
+	}
+	if got != (Color{255, 128, 0, 1.0}) {
+		t.Fatalf("FindFirst returned %+v, want %+v", got, Color{255, 128, 0, 1.0})
+	}
+}
+
+func TestFindFirstReturnsEarliestValidColor(t *testing.T) {
+	got, err := FindFirst("first #00FF00 then rgb(255 0 0)")
+	if err != nil {
+		t.Fatalf("FindFirst returned error: %v", err)
+	}
+	if got != (Color{0, 255, 0, 1.0}) {
+		t.Fatalf("FindFirst returned %+v, want %+v", got, Color{0, 255, 0, 1.0})
 	}
 }

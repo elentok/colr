@@ -23,11 +23,13 @@ Or pass a color directly:
 ```sh
 colr "#ff8000"
 colr 255 128 0
+colr "button=rgb(255 128 0); border=#112233"
 ```
 
-The app reads your clipboard on launch and opens a TUI showing a live preview,
-an editor, and output formats. When you're done, copy the result with `yr`,
-`yx`, or `yh` and quit with `q`.
+The app reads your clipboard on launch, searches the provided text for the
+first valid CSS color, and opens a TUI showing a live preview, an editor, and
+output formats. When you're done, copy the result with `yr`, `yx`, or `yh` and
+quit with `q`.
 
 ## Keybindings
 

@@ -4,11 +4,21 @@ import (
 	"fmt"
 	"math"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 )
 
 var hexRe = regexp.MustCompile(`^#?([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$`)
+var hexSearchRe = regexp.MustCompile(`#?[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?`)
+var rgbSearchRe = regexp.MustCompile(`(?i)rgba?\([^)]*\)`)
+var hslSearchRe = regexp.MustCompile(`(?i)hsla?\([^)]*\)`)
+var bareSearchRe = regexp.MustCompile(`(?:\d+(?:\.\d+)?%?\s*,\s*){2}\d+(?:\.\d+)?%?|(?:\d+(?:\.\d+)?%?\s+){2}\d+(?:\.\d+)?%?`)
+
+type candidateMatch struct {
+	start int
+	text  string
+}
 
 // Parse parses a CSS color string into a Color.
 // Trims surrounding whitespace and trailing semicolons.
@@ -33,6 +43,104 @@ func Parse(input string) (Color, error) {
 	}
 
 	return Color{}, fmt.Errorf("unrecognized color format")
+}
+
+// FindFirst parses the first valid color found anywhere in the input text.
+func FindFirst(input string) (Color, error) {
+	if c, err := Parse(input); err == nil {
+		return c, nil
+	}
+
+	candidates := collectCandidates(input)
+	sort.Slice(candidates, func(i, j int) bool {
+		if candidates[i].start != candidates[j].start {
+			return candidates[i].start < candidates[j].start
+		}
+		return len(candidates[i].text) > len(candidates[j].text)
+	})
+
+	for _, candidate := range candidates {
+		if c, err := Parse(candidate.text); err == nil {
+			return c, nil
+		}
+	}
+
+	return Color{}, fmt.Errorf("unrecognized color format")
+}
+
+func collectCandidates(input string) []candidateMatch {
+	candidates := make([]candidateMatch, 0)
+
+	for _, idx := range rgbSearchRe.FindAllStringIndex(input, -1) {
+		candidates = append(candidates, candidateMatch{
+			start: idx[0],
+			text:  input[idx[0]:idx[1]],
+		})
+	}
+
+	for _, idx := range hslSearchRe.FindAllStringIndex(input, -1) {
+		candidates = append(candidates, candidateMatch{
+			start: idx[0],
+			text:  input[idx[0]:idx[1]],
+		})
+	}
+
+	for _, idx := range bareSearchRe.FindAllStringIndex(input, -1) {
+		if !isBareBoundary(input, idx[0], idx[1]) {
+			continue
+		}
+		candidates = append(candidates, candidateMatch{
+			start: idx[0],
+			text:  input[idx[0]:idx[1]],
+		})
+	}
+
+	for _, idx := range hexSearchRe.FindAllStringIndex(input, -1) {
+		if !isHexBoundary(input, idx[0], idx[1]) {
+			continue
+		}
+		candidates = append(candidates, candidateMatch{
+			start: idx[0],
+			text:  input[idx[0]:idx[1]],
+		})
+	}
+
+	return candidates
+}
+
+func isHexBoundary(input string, start, end int) bool {
+	if start > 0 {
+		prev := input[start-1]
+		if isHexDigit(prev) || prev == '#' {
+			return false
+		}
+	}
+
+	if end < len(input) && isHexDigit(input[end]) {
+		return false
+	}
+
+	return true
+}
+
+func isBareBoundary(input string, start, end int) bool {
+	if start > 0 && isBareTokenChar(input[start-1]) {
+		return false
+	}
+
+	if end < len(input) && isBareTokenChar(input[end]) {
+		return false
+	}
+
+	return true
+}
+
+func isHexDigit(b byte) bool {
+	return ('0' <= b && b <= '9') || ('a' <= b && b <= 'f') || ('A' <= b && b <= 'F')
+}
+
+func isBareTokenChar(b byte) bool {
+	return ('0' <= b && b <= '9') || ('a' <= b && b <= 'z') || ('A' <= b && b <= 'Z') || b == '.' || b == '%'
 }
 
 // parseHEX handles #RRGGBB, RRGGBB, #RRGGBBAA, RRGGBBAA (case-insensitive).
