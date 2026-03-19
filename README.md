@@ -31,6 +31,9 @@ first valid CSS color, and opens a TUI showing a live preview, an editor, and
 output formats. When you're done, copy the result with `yr`, `yx`, or `yh` and
 quit with `q`.
 
+History is stored locally in `XDG_STATE_HOME/colr/history.json` and keeps the
+last 100 colors, newest first.
+
 ## Keybindings
 
 | Key            | Action                    |
@@ -41,6 +44,7 @@ quit with `q`.
 | `g` / `G`      | First / last field        |
 | `tab`          | Toggle HSV / RGB mode     |
 | `1` / `2`      | Switch to HSV / RGB mode  |
+| `p`            | Open history selector     |
 | `yr` / `yy`    | Copy RGB to clipboard     |
 | `yx`           | Copy HEX to clipboard     |
 | `yh`           | Copy HSL to clipboard     |

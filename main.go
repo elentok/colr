@@ -10,6 +10,7 @@ import (
 	"github.com/elentok/colr/app"
 	"github.com/elentok/colr/clipboard"
 	"github.com/elentok/colr/color"
+	"github.com/elentok/colr/history"
 )
 
 func resolveInput(args []string, readClipboard func() (string, error)) (string, error) {
@@ -34,10 +35,28 @@ func main() {
 		os.Exit(1)
 	}
 
-	model := app.NewModel(inputText, c)
+	historyEntries, err := history.Load()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "colr: failed to load history")
+		os.Exit(1)
+	}
+
+	model := app.NewModel(inputText, c, historyEntries)
 	p := tea.NewProgram(model)
-	if _, err := p.Run(); err != nil {
+	finalModel, err := p.Run()
+	if err != nil {
 		fmt.Fprintln(os.Stderr, "colr:", err)
+		os.Exit(1)
+	}
+
+	m, ok := finalModel.(app.Model)
+	if !ok {
+		fmt.Fprintln(os.Stderr, "colr: unexpected final model type")
+		os.Exit(1)
+	}
+
+	if err := history.Save(m.HistoryEntriesForSave()); err != nil {
+		fmt.Fprintln(os.Stderr, "colr: failed to save history")
 		os.Exit(1)
 	}
 }

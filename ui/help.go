@@ -48,6 +48,14 @@ func RenderHelp(width, height int) string {
 	content += helpRow("yr / yy", "copy RGB")
 	content += helpRow("yx", "copy HEX")
 	content += helpRow("yh", "copy HSL")
+	content += helpRow("yn", "copy CSS name")
+	content += "\n"
+
+	content += helpSectionStyle.Render("History") + "\n"
+	content += helpRow("p", "open color history")
+	content += helpRow("j/k  ↑/↓", "move within history")
+	content += helpRow("enter", "load selected color")
+	content += helpRow("Esc / q / p", "close history")
 	content += "\n"
 
 	content += helpSectionStyle.Render("Other") + "\n"

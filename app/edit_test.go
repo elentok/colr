@@ -5,11 +5,16 @@ import (
 	"testing"
 
 	"github.com/elentok/colr/color"
+	"github.com/elentok/colr/history"
 	"github.com/elentok/colr/ui"
 )
 
 func newTestModel(c color.Color) Model {
-	return NewModel("test", c)
+	return NewModel("test", c, nil)
+}
+
+func newHistoryTestModel(c color.Color, entries []history.Entry) Model {
+	return NewModel("test", c, entries)
 }
 
 func TestAdjustHSVHue(t *testing.T) {

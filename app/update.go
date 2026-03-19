@@ -37,6 +37,10 @@ func handleKeyMsg(m Model, key string) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
+	if m.showHistory {
+		return handleHistoryKey(m, key), nil
+	}
+
 	// Normal key handling.
 	switch key {
 	case "q":
@@ -44,6 +48,17 @@ func handleKeyMsg(m Model, key string) (tea.Model, tea.Cmd) {
 
 	case "?":
 		m.showHelp = true
+
+	case "p":
+		m.pendingY = false
+		if len(m.historyEntries) == 0 {
+			m.toastMessage = "No history yet"
+			return m, nil
+		}
+		if m.historyIndex >= len(m.historyEntries) {
+			m.historyIndex = len(m.historyEntries) - 1
+		}
+		m.showHistory = true
 
 	default:
 		var cmd tea.Cmd
@@ -122,6 +137,34 @@ func handleKey(m Model, key string) Model {
 	// Reset
 	case "R":
 		m = applyReset(m)
+	}
+
+	return m
+}
+
+func handleHistoryKey(m Model, key string) Model {
+	switch key {
+	case "p", "esc", "q":
+		m.showHistory = false
+	case "j", "down":
+		if m.historyIndex < len(m.historyEntries)-1 {
+			m.historyIndex++
+		}
+	case "k", "up":
+		if m.historyIndex > 0 {
+			m.historyIndex--
+		}
+	case "g":
+		m.historyIndex = 0
+	case "G":
+		if len(m.historyEntries) > 0 {
+			m.historyIndex = len(m.historyEntries) - 1
+		}
+	case "enter":
+		if len(m.historyEntries) > 0 {
+			m = applyHistoryEntry(m, m.historyEntries[m.historyIndex])
+			m.toastMessage = "Loaded color from history"
+		}
 	}
 
 	return m

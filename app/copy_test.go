@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/elentok/colr/color"
+	"github.com/elentok/colr/history"
 )
 
 func TestApplyCopyToastMessages(t *testing.T) {
@@ -186,5 +187,53 @@ func TestHelpBlocksOtherKeys(t *testing.T) {
 	updated := result.(Model)
 	if updated.selectedField != original {
 		t.Errorf("expected field unchanged while help open, got %d", updated.selectedField)
+	}
+}
+
+func TestPOpensHistoryOverlay(t *testing.T) {
+	m := newHistoryTestModel(color.Color{R: 255, G: 0, B: 0, A: 1}, []history.Entry{
+		{Original: "#00ff00", Color: color.Color{R: 0, G: 255, B: 0, A: 1}},
+	})
+
+	result, _ := handleKeyMsg(m, "p")
+	updated := result.(Model)
+	if !updated.showHistory {
+		t.Error("expected showHistory=true after 'p'")
+	}
+}
+
+func TestHistoryOverlayLoadsSelectedEntry(t *testing.T) {
+	entry := history.Entry{Original: "#00ff00", Color: color.Color{R: 0, G: 255, B: 0, A: 1}}
+	m := newHistoryTestModel(color.Color{R: 255, G: 0, B: 0, A: 1}, []history.Entry{entry})
+	m.showHistory = true
+
+	result, _ := handleKeyMsg(m, "enter")
+	updated := result.(Model)
+	if updated.showHistory {
+		t.Error("expected showHistory=false after loading a history color")
+	}
+	if updated.currentColor != entry.Color {
+		t.Errorf("currentColor = %+v, want %+v", updated.currentColor, entry.Color)
+	}
+	if updated.originalClip != entry.Original {
+		t.Errorf("originalClip = %q, want %q", updated.originalClip, entry.Original)
+	}
+}
+
+func TestHistoryOverlayConsumesEditingKeys(t *testing.T) {
+	m := newHistoryTestModel(color.Color{R: 255, G: 0, B: 0, A: 1}, []history.Entry{
+		{Original: "#00ff00", Color: color.Color{R: 0, G: 255, B: 0, A: 1}},
+		{Original: "#0000ff", Color: color.Color{R: 0, G: 0, B: 255, A: 1}},
+	})
+	m.showHistory = true
+	m.selectedField = FieldOpacity
+
+	result, _ := handleKeyMsg(m, "j")
+	updated := result.(Model)
+	if updated.historyIndex != 1 {
+		t.Errorf("historyIndex = %d, want 1", updated.historyIndex)
+	}
+	if updated.selectedField != FieldOpacity {
+		t.Errorf("selectedField changed while history open: got %d want %d", updated.selectedField, FieldOpacity)
 	}
 }

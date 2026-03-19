@@ -25,6 +25,10 @@ func (m Model) render() string {
 		return ui.RenderHelp(m.width, m.height)
 	}
 
+	if m.showHistory {
+		return ui.RenderHistory(m.width, m.height, m.historyEntries, m.historyIndex)
+	}
+
 	// In lipgloss v2, Width() is the total outer width (border included).
 	// outerW = full terminal width; innerW = content width inside outer border.
 	outerW := m.width
