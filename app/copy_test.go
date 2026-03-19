@@ -193,7 +193,7 @@ func TestHelpBlocksOtherKeys(t *testing.T) {
 
 func TestPOpensHistoryOverlay(t *testing.T) {
 	m := newHistoryTestModel(color.Color{R: 255, G: 0, B: 0, A: 1}, []history.Entry{
-		{Original: "#00ff00", Color: color.Color{R: 0, G: 255, B: 0, A: 1}},
+		{RGB: "rgb(0 255 0)", HEX: "#00FF00", Name: "lime"},
 	})
 
 	result, _ := handleKeyMsg(m, "p")
@@ -204,7 +204,7 @@ func TestPOpensHistoryOverlay(t *testing.T) {
 }
 
 func TestHistoryOverlayLoadsSelectedEntry(t *testing.T) {
-	entry := history.Entry{Original: "#00ff00", Color: color.Color{R: 0, G: 255, B: 0, A: 1}}
+	entry := history.Entry{RGB: "rgb(0 255 0)", HEX: "#00FF00", Name: "lime"}
 	m := newHistoryTestModel(color.Color{R: 255, G: 0, B: 0, A: 1}, []history.Entry{entry})
 	m.showHistory = true
 
@@ -213,18 +213,19 @@ func TestHistoryOverlayLoadsSelectedEntry(t *testing.T) {
 	if updated.showHistory {
 		t.Error("expected showHistory=false after loading a history color")
 	}
-	if updated.currentColor != entry.Color {
-		t.Errorf("currentColor = %+v, want %+v", updated.currentColor, entry.Color)
+	wantColor := color.Color{R: 0, G: 255, B: 0, A: 1}
+	if updated.currentColor != wantColor {
+		t.Errorf("currentColor = %+v, want %+v", updated.currentColor, wantColor)
 	}
-	if updated.originalClip != entry.Original {
-		t.Errorf("originalClip = %q, want %q", updated.originalClip, entry.Original)
+	if updated.originalClip != entry.RGB {
+		t.Errorf("originalClip = %q, want %q", updated.originalClip, entry.RGB)
 	}
 }
 
 func TestHistoryOverlayConsumesEditingKeys(t *testing.T) {
 	m := newHistoryTestModel(color.Color{R: 255, G: 0, B: 0, A: 1}, []history.Entry{
-		{Original: "#00ff00", Color: color.Color{R: 0, G: 255, B: 0, A: 1}},
-		{Original: "#0000ff", Color: color.Color{R: 0, G: 0, B: 255, A: 1}},
+		{RGB: "rgb(0 255 0)", HEX: "#00FF00", Name: "lime"},
+		{RGB: "rgb(0 0 255)", HEX: "#0000FF", Name: "blue"},
 	})
 	m.showHistory = true
 	m.selectedField = FieldOpacity
@@ -255,7 +256,7 @@ func TestSPressesStartsHistorySave(t *testing.T) {
 func TestSaveHistoryMsgUpdatesEntriesAndToast(t *testing.T) {
 	m := newTestModel(color.Color{R: 255, G: 0, B: 0, A: 1})
 	entries := []history.Entry{
-		{Original: "rgb(255 0 0)", Color: color.Color{R: 255, G: 0, B: 0, A: 1}},
+		{RGB: "rgb(255 0 0)", HEX: "#FF0000", Name: "red"},
 	}
 
 	result, _ := m.Update(SaveHistoryMsg{entries: entries})

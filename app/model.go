@@ -63,14 +63,21 @@ func (m Model) WithToast(msg string) Model {
 }
 
 func (m Model) HistoryEntriesForSave() []history.Entry {
-	return history.Record(m.historyEntries, m.originalClip, m.currentColor)
+	return history.Record(m.historyEntries, m.currentColor)
 }
 
 func applyHistoryEntry(m Model, entry history.Entry) Model {
-	hsv := color.RGBToHSV(entry.Color)
-	m.originalClip = entry.Original
-	m.originalColor = entry.Color
-	m.currentColor = entry.Color
+	c, err := entry.Color()
+	if err != nil {
+		m.toastMessage = "Failed to load color from history"
+		m.showHistory = false
+		return m
+	}
+
+	hsv := color.RGBToHSV(c)
+	m.originalClip = entry.RGB
+	m.originalColor = c
+	m.currentColor = c
 	m.lastHue = hsv.H
 	m.showHistory = false
 	m.pendingY = false

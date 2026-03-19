@@ -6,7 +6,6 @@ import (
 
 	"charm.land/lipgloss/v2"
 
-	"github.com/elentok/colr/color"
 	"github.com/elentok/colr/history"
 )
 
@@ -66,12 +65,9 @@ func RenderHistory(width, height int, entries []history.Entry, selected int) str
 
 	swatchW := 6
 	rgbW := 22
+	hexW := 12
 	nameW := 16
-	metaPadding := 12
-	originalW := contentWidth - swatchW - rgbW - nameW - metaPadding
-	if originalW < 12 {
-		originalW = 12
-	}
+	metaPadding := 14
 
 	var lines []string
 	for i := start; i < end; i++ {
@@ -82,17 +78,16 @@ func RenderHistory(width, height int, entries []history.Entry, selected int) str
 		}
 
 		swatch := lipgloss.NewStyle().
-			Background(lipgloss.Color(color.FormatHEX(entry.Color))).
+			Background(lipgloss.Color(entry.HEX)).
 			Width(swatchW).
 			Render(strings.Repeat(" ", swatchW))
 
-		original := truncate(entry.Original, originalW)
-		originalCell := HeaderValueStyle.Width(originalW).Render(original)
-		rgbCell := OutputValueStyle.Width(rgbW).Render(color.FormatRGB(entry.Color))
-		nameCell := historyMetaStyle.Width(nameW).Render(color.NearestNamedColor(entry.Color))
-		row := fmt.Sprintf("%s%s  %s  %s  %s", indicator, swatch, originalCell, rgbCell, nameCell)
+		rgbCell := OutputValueStyle.Width(rgbW).Render(entry.RGB)
+		hexCell := OutputValueStyle.Width(hexW).Render(entry.HEX)
+		nameCell := historyMetaStyle.Width(nameW).Render(entry.Name)
+		row := fmt.Sprintf("%s%s  %s  %s  %s", indicator, swatch, rgbCell, hexCell, nameCell)
 		if i == selected {
-			row = historySelectedStyle.Width(contentWidth).Render(row)
+			row = historySelectedStyle.Width(contentWidth - metaPadding).Render(row)
 		}
 		lines = append(lines, row)
 	}

@@ -70,7 +70,7 @@ func TestResolveInputReturnsClipboardError(t *testing.T) {
 
 func TestResolveStartupColorUsesParsedInput(t *testing.T) {
 	inputText, got, toast, err := resolveStartupColor("button=#ff0000", []history.Entry{
-		{Original: "#00ff00", Color: color.Color{R: 0, G: 255, B: 0, A: 1}},
+		{RGB: "rgb(0 255 0)", HEX: "#00FF00", Name: "lime"},
 	})
 	if err != nil {
 		t.Fatalf("resolveStartupColor returned error: %v", err)
@@ -88,19 +88,20 @@ func TestResolveStartupColorUsesParsedInput(t *testing.T) {
 
 func TestResolveStartupColorFallsBackToHistory(t *testing.T) {
 	entry := history.Entry{
-		Original: "rgb(0 255 0)",
-		Color:    color.Color{R: 0, G: 255, B: 0, A: 1},
+		RGB:  "rgb(0 255 0)",
+		HEX:  "#00FF00",
+		Name: "lime",
 	}
 
 	inputText, got, toast, err := resolveStartupColor("not a color", []history.Entry{entry})
 	if err != nil {
 		t.Fatalf("resolveStartupColor returned error: %v", err)
 	}
-	if inputText != entry.Original {
-		t.Fatalf("resolveStartupColor inputText = %q, want %q", inputText, entry.Original)
+	if inputText != entry.RGB {
+		t.Fatalf("resolveStartupColor inputText = %q, want %q", inputText, entry.RGB)
 	}
-	if got != entry.Color {
-		t.Fatalf("resolveStartupColor color = %+v, want %+v", got, entry.Color)
+	if got != (color.Color{R: 0, G: 255, B: 0, A: 1}) {
+		t.Fatalf("resolveStartupColor color = %+v, want lime", got)
 	}
 	if toast == "" {
 		t.Fatal("resolveStartupColor should return a toast message for history fallback")

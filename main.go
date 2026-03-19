@@ -30,7 +30,10 @@ func resolveStartupColor(inputText string, historyEntries []history.Entry) (stri
 	}
 
 	if len(historyEntries) > 0 {
-		return historyEntries[0].Original, historyEntries[0].Color, "Input had no color; loaded last history color", nil
+		c, err := historyEntries[0].Color()
+		if err == nil {
+			return historyEntries[0].RGB, c, "Input had no color; loaded last history color", nil
+		}
 	}
 
 	return "", color.Color{}, "", errNoColorAvailable
