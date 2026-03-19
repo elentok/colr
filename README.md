@@ -2,7 +2,9 @@
 
 An interactive terminal color editor. Copy a CSS color to your clipboard, run
 `colr`, and adjust it in real time — then copy the result back out in any
-format.
+format. The interface keeps the original and edited colors visible side by
+side or stacked depending on terminal shape, and can remember your recent
+colors in local history.
 
 ![screenshot](./docs/screenshot.png)
 
@@ -29,7 +31,8 @@ colr "button=rgb(255 128 0); border=#112233"
 The app reads your clipboard on launch, searches the provided text for the
 first valid CSS color, and opens a TUI showing a live preview, an editor, and
 output formats. When you're done, copy the result with `yr`, `yx`, or `yh` and
-quit with `q`.
+quit with `q`. Press `s` at any time to save the current edited color to
+history immediately.
 
 History is stored locally in `XDG_STATE_HOME/colr/history.json` and keeps the
 last 100 colors, newest first.

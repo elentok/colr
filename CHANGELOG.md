@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.0] - 2026-03-20
+
+### Added
+- Explicit history save with `s`, so the current edited color can be written to history without quitting
+- Startup fallback to the most recent history color when clipboard or CLI input contains no color
+
+### Changed
+- History entries now store normalized RGB, HEX, and CSS name values instead of clipboard-origin text
+- HEX output is now normalized to lowercase consistently across the UI, history, and copied HEX values
+- The preview compares original versus edited colors, with responsive behavior:
+  - landscape terminals show a right sidebar with stacked original/edited previews
+  - portrait terminals move the preview to the bottom and show original/edited side-by-side
+- Main layout updated to use separate bordered panels for the header, editor, formats, and preview
+
 ## [0.0.2] - 2026-03-19
 
 ### Added

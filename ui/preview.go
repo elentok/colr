@@ -9,8 +9,23 @@ import (
 	"github.com/elentok/colr/color"
 )
 
+type PreviewLayout int
+
+const (
+	PreviewStacked PreviewLayout = iota
+	PreviewSideBySide
+)
+
 // RenderPreview renders the color preview block.
-func RenderPreview(original, current color.Color, width, height int) string {
+func RenderPreview(original, current color.Color, width, height int, layout PreviewLayout) string {
+	if layout == PreviewSideBySide {
+		return renderPreviewSideBySide(original, current, width, height)
+	}
+
+	return renderPreviewStacked(original, current, width, height)
+}
+
+func renderPreviewStacked(original, current color.Color, width, height int) string {
 	if height < 6 {
 		height = 6
 	}
@@ -31,8 +46,32 @@ func RenderPreview(original, current color.Color, width, height int) string {
 	return strings.Join([]string{top, bottom}, "\n")
 }
 
+func renderPreviewSideBySide(original, current color.Color, width, height int) string {
+	if width < 20 {
+		width = 20
+	}
+	if height < 4 {
+		height = 4
+	}
+
+	leftW := width / 2
+	rightW := width - leftW
+	if leftW < 10 {
+		leftW = 10
+		rightW = width - leftW
+	}
+	if rightW < 10 {
+		rightW = 10
+		leftW = width - rightW
+	}
+
+	left := renderPreviewSection("Original", original, leftW, height)
+	right := renderPreviewSection("Edited", current, rightW, height)
+	return lipgloss.JoinHorizontal(lipgloss.Top, left, right)
+}
+
 func renderPreviewSection(title string, c color.Color, width, height int) string {
-	hexColor := fmt.Sprintf("#%02X%02X%02X", c.R, c.G, c.B)
+	hexColor := fmt.Sprintf("#%02x%02x%02x", c.R, c.G, c.B)
 
 	// Compute foreground suggestion via relative luminance.
 	r := float64(c.R) / 255.0

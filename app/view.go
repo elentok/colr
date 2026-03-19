@@ -41,6 +41,71 @@ func (m Model) render() string {
 		bodyH = 8
 	}
 
+	headerContent := ui.RenderHeader(
+		m.originalClip,
+		color.FormatRGB(m.currentColor),
+		m.toastMessage,
+		totalW-2,
+	)
+	headerPanel := lipgloss.NewStyle().
+		Border(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		Width(totalW).
+		Height(headerPanelH).
+		Render(headerContent)
+
+	footer := ui.RenderFooter(totalW)
+	isPortrait := usePortraitLayout(totalW, totalH)
+
+	if isPortrait {
+		previewPanelH := bodyH * 38 / 100
+		if previewPanelH < 8 {
+			previewPanelH = 8
+		}
+		if previewPanelH > bodyH-10 {
+			previewPanelH = bodyH - 10
+		}
+		topSectionH := bodyH - previewPanelH
+		if topSectionH < 8 {
+			topSectionH = 8
+			previewPanelH = bodyH - topSectionH
+		}
+
+		formatsPanelH := outputsPanelH
+		editorPanelH := topSectionH - formatsPanelH
+		if editorPanelH < 6 {
+			editorPanelH = 6
+			formatsPanelH = topSectionH - editorPanelH
+		}
+
+		editorContent := ui.RenderEditor(m.currentColor, m.editMode, m.selectedField, m.lastHue, totalW-2)
+		editorPanel := lipgloss.NewStyle().
+			Border(lipgloss.NormalBorder()).
+			BorderForeground(lipgloss.Color("240")).
+			Width(totalW).
+			Height(editorPanelH).
+			Render(editorContent)
+
+		formatsContent := ui.RenderOutputs(m.currentColor, totalW-2)
+		formatsPanel := lipgloss.NewStyle().
+			Border(lipgloss.NormalBorder()).
+			BorderForeground(lipgloss.Color("240")).
+			Width(totalW).
+			Height(formatsPanelH).
+			Render(formatsContent)
+
+		previewContent := ui.RenderPreview(m.originalColor, m.currentColor, totalW-2, previewPanelH-2, ui.PreviewSideBySide)
+		previewPanel := lipgloss.NewStyle().
+			Border(lipgloss.NormalBorder()).
+			BorderForeground(lipgloss.Color("240")).
+			Width(totalW).
+			Height(previewPanelH).
+			Render(previewContent)
+
+		body := lipgloss.JoinVertical(lipgloss.Left, editorPanel, formatsPanel, previewPanel)
+		return lipgloss.JoinVertical(lipgloss.Left, headerPanel, body, footer)
+	}
+
 	rightW := totalW * 38 / 100
 	if rightW < 24 {
 		rightW = 24
@@ -74,19 +139,6 @@ func (m Model) render() string {
 		formatsPanelH = bodyH - editorPanelH
 	}
 
-	headerContent := ui.RenderHeader(
-		m.originalClip,
-		color.FormatRGB(m.currentColor),
-		m.toastMessage,
-		totalW-2,
-	)
-	headerPanel := lipgloss.NewStyle().
-		Border(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")).
-		Width(totalW).
-		Height(headerPanelH).
-		Render(headerContent)
-
 	editorContent := ui.RenderEditor(m.currentColor, m.editMode, m.selectedField, m.lastHue, leftW-2)
 	editorPanel := lipgloss.NewStyle().
 		Border(lipgloss.NormalBorder()).
@@ -105,7 +157,7 @@ func (m Model) render() string {
 
 	leftColumn := lipgloss.JoinVertical(lipgloss.Left, editorPanel, formatsPanel)
 
-	previewContent := ui.RenderPreview(m.originalColor, m.currentColor, rightW-2, bodyH-2)
+	previewContent := ui.RenderPreview(m.originalColor, m.currentColor, rightW-2, bodyH-2, ui.PreviewStacked)
 	previewPanel := lipgloss.NewStyle().
 		Border(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("240")).
@@ -114,7 +166,11 @@ func (m Model) render() string {
 		Render(previewContent)
 
 	bodyRow := lipgloss.JoinHorizontal(lipgloss.Top, leftColumn, previewPanel)
-	footer := ui.RenderFooter(totalW)
-
 	return lipgloss.JoinVertical(lipgloss.Left, headerPanel, bodyRow, footer)
+}
+
+func usePortraitLayout(width, height int) bool {
+	// Terminal cells are visually taller than they are wide, so a raw width<height
+	// comparison waits too long before switching to the portrait layout.
+	return width <= height*2
 }
