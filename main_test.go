@@ -70,7 +70,7 @@ func TestResolveInputReturnsClipboardError(t *testing.T) {
 
 func TestResolveStartupColorUsesParsedInput(t *testing.T) {
 	inputText, got, toast, err := resolveStartupColor("button=#ff0000", []history.Entry{
-		{RGB: "rgb(0 255 0)", HEX: "#00FF00", Name: "lime"},
+		{RGB: "rgb(0 255 0)", HEX: "#00ff00", Name: "lime"},
 	})
 	if err != nil {
 		t.Fatalf("resolveStartupColor returned error: %v", err)
@@ -89,7 +89,7 @@ func TestResolveStartupColorUsesParsedInput(t *testing.T) {
 func TestResolveStartupColorFallsBackToHistory(t *testing.T) {
 	entry := history.Entry{
 		RGB:  "rgb(0 255 0)",
-		HEX:  "#00FF00",
+		HEX:  "#00ff00",
 		Name: "lime",
 	}
 

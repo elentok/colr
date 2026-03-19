@@ -76,7 +76,7 @@ Channel values accept integers (0–255) or percentages. Alpha accepts a decimal
 | Command     | Format | Example                                       |
 | ----------- | ------ | --------------------------------------------- |
 | `yr` / `yy` | RGB    | `rgb(255 128 0)` / `rgb(255 128 0 / 50%)`     |
-| `yx`        | HEX    | `#FF8000` / `#FF800080`                       |
+| `yx`        | HEX    | `#ff8000` / `#ff800080`                       |
 | `yh`        | HSL    | `hsl(30 100% 50%)` / `hsl(30 100% 50% / 50%)` |
 
 Alpha is omitted when 100%, included as an integer percentage otherwise.

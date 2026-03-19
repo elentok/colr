@@ -31,12 +31,12 @@ func TestFormatHEX(t *testing.T) {
 		color Color
 		want  string
 	}{
-		{Color{255, 0, 0, 1.0}, "#FF0000"},
-		{Color{255, 0, 0, 0.5}, "#FF000080"},
+		{Color{255, 0, 0, 1.0}, "#ff0000"},
+		{Color{255, 0, 0, 0.5}, "#ff000080"},
 		{Color{0, 0, 0, 1.0}, "#000000"},
-		{Color{255, 255, 255, 1.0}, "#FFFFFF"},
+		{Color{255, 255, 255, 1.0}, "#ffffff"},
 		{Color{0, 0, 0, 0.0}, "#00000000"},
-		{Color{163, 163, 163, 1.0}, "#A3A3A3"},
+		{Color{163, 163, 163, 1.0}, "#a3a3a3"},
 	}
 	for _, tc := range tests {
 		t.Run(tc.want, func(t *testing.T) {
@@ -73,13 +73,13 @@ func TestFormatHSL(t *testing.T) {
 
 func TestParseRoundTrip(t *testing.T) {
 	inputs := []string{
-		"#FF0000",
+		"#ff0000",
 		"#000000",
-		"#FFFFFF",
-		"#00FF00",
-		"#0000FF",
+		"#ffffff",
+		"#00ff00",
+		"#0000ff",
 		"#808080",
-		"#FF000080",
+		"#ff000080",
 	}
 	for _, input := range inputs {
 		t.Run(input, func(t *testing.T) {

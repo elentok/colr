@@ -10,19 +10,19 @@ import (
 
 func TestRecordMovesDuplicateToFront(t *testing.T) {
 	existing := []Entry{
-		{RGB: "rgb(255 0 0)", HEX: "#FF0000", Name: "red"},
-		{RGB: "rgb(0 0 255)", HEX: "#0000FF", Name: "blue"},
+		{RGB: "rgb(255 0 0)", HEX: "#ff0000", Name: "red"},
+		{RGB: "rgb(0 0 255)", HEX: "#0000ff", Name: "blue"},
 	}
 
 	got := Record(existing, color.Color{R: 255, G: 0, B: 0, A: 1})
 	if len(got) != 2 {
 		t.Fatalf("Record returned %d entries, want 2", len(got))
 	}
-	if got[0].HEX != "#FF0000" {
-		t.Fatalf("front entry hex = %q, want %q", got[0].HEX, "#FF0000")
+	if got[0].HEX != "#ff0000" {
+		t.Fatalf("front entry hex = %q, want %q", got[0].HEX, "#ff0000")
 	}
-	if got[1].HEX != "#0000FF" {
-		t.Fatalf("second entry hex = %q, want %q", got[1].HEX, "#0000FF")
+	if got[1].HEX != "#0000ff" {
+		t.Fatalf("second entry hex = %q, want %q", got[1].HEX, "#0000ff")
 	}
 }
 
@@ -40,8 +40,8 @@ func TestRecordCapsHistory(t *testing.T) {
 	if len(got) != MaxEntries {
 		t.Fatalf("Record returned %d entries, want %d", len(got), MaxEntries)
 	}
-	if got[0].HEX != "#C86432" {
-		t.Fatalf("front entry hex = %q, want %q", got[0].HEX, "#C86432")
+	if got[0].HEX != "#c86432" {
+		t.Fatalf("front entry hex = %q, want %q", got[0].HEX, "#c86432")
 	}
 }
 
@@ -49,8 +49,8 @@ func TestSaveAndLoadRoundTrip(t *testing.T) {
 	t.Setenv("XDG_STATE_HOME", t.TempDir())
 
 	want := []Entry{
-		{RGB: "rgb(255 0 0)", HEX: "#FF0000", Name: "red"},
-		{RGB: "rgb(0 255 0)", HEX: "#00FF00", Name: "lime"},
+		{RGB: "rgb(255 0 0)", HEX: "#ff0000", Name: "red"},
+		{RGB: "rgb(0 255 0)", HEX: "#00ff00", Name: "lime"},
 	}
 
 	if err := Save(want); err != nil {
@@ -94,7 +94,7 @@ func TestLoadMigratesLegacyEntries(t *testing.T) {
 	if len(got) != 1 {
 		t.Fatalf("Load returned %d entries, want 1", len(got))
 	}
-	if got[0].HEX != "#FF0000" || got[0].RGB != "rgb(255 0 0)" {
+	if got[0].HEX != "#ff0000" || got[0].RGB != "rgb(255 0 0)" {
 		t.Fatalf("migrated entry = %+v, want normalized red entry", got[0])
 	}
 }

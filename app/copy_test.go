@@ -193,7 +193,7 @@ func TestHelpBlocksOtherKeys(t *testing.T) {
 
 func TestPOpensHistoryOverlay(t *testing.T) {
 	m := newHistoryTestModel(color.Color{R: 255, G: 0, B: 0, A: 1}, []history.Entry{
-		{RGB: "rgb(0 255 0)", HEX: "#00FF00", Name: "lime"},
+		{RGB: "rgb(0 255 0)", HEX: "#00ff00", Name: "lime"},
 	})
 
 	result, _ := handleKeyMsg(m, "p")
@@ -204,7 +204,7 @@ func TestPOpensHistoryOverlay(t *testing.T) {
 }
 
 func TestHistoryOverlayLoadsSelectedEntry(t *testing.T) {
-	entry := history.Entry{RGB: "rgb(0 255 0)", HEX: "#00FF00", Name: "lime"}
+	entry := history.Entry{RGB: "rgb(0 255 0)", HEX: "#00ff00", Name: "lime"}
 	m := newHistoryTestModel(color.Color{R: 255, G: 0, B: 0, A: 1}, []history.Entry{entry})
 	m.showHistory = true
 
@@ -224,8 +224,8 @@ func TestHistoryOverlayLoadsSelectedEntry(t *testing.T) {
 
 func TestHistoryOverlayConsumesEditingKeys(t *testing.T) {
 	m := newHistoryTestModel(color.Color{R: 255, G: 0, B: 0, A: 1}, []history.Entry{
-		{RGB: "rgb(0 255 0)", HEX: "#00FF00", Name: "lime"},
-		{RGB: "rgb(0 0 255)", HEX: "#0000FF", Name: "blue"},
+		{RGB: "rgb(0 255 0)", HEX: "#00ff00", Name: "lime"},
+		{RGB: "rgb(0 0 255)", HEX: "#0000ff", Name: "blue"},
 	})
 	m.showHistory = true
 	m.selectedField = FieldOpacity
@@ -256,7 +256,7 @@ func TestSPressesStartsHistorySave(t *testing.T) {
 func TestSaveHistoryMsgUpdatesEntriesAndToast(t *testing.T) {
 	m := newTestModel(color.Color{R: 255, G: 0, B: 0, A: 1})
 	entries := []history.Entry{
-		{RGB: "rgb(255 0 0)", HEX: "#FF0000", Name: "red"},
+		{RGB: "rgb(255 0 0)", HEX: "#ff0000", Name: "red"},
 	}
 
 	result, _ := m.Update(SaveHistoryMsg{entries: entries})

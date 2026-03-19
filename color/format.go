@@ -15,14 +15,14 @@ func FormatRGB(c Color) string {
 	return fmt.Sprintf("rgb(%d %d %d / %d%%)", c.R, c.G, c.B, pct)
 }
 
-// FormatHEX returns the normalized uppercase hex string.
+// FormatHEX returns the normalized lowercase hex string.
 // Alpha byte is omitted when alpha is 100%.
 func FormatHEX(c Color) string {
 	if c.A >= 1.0 {
-		return fmt.Sprintf("#%02X%02X%02X", c.R, c.G, c.B)
+		return fmt.Sprintf("#%02x%02x%02x", c.R, c.G, c.B)
 	}
 	alphaByte := uint8(math.Round(c.A * 255))
-	return fmt.Sprintf("#%02X%02X%02X%02X", c.R, c.G, c.B, alphaByte)
+	return fmt.Sprintf("#%02x%02x%02x%02x", c.R, c.G, c.B, alphaByte)
 }
 
 // FormatHSL returns the normalized CSS hsl() string.
