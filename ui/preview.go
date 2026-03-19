@@ -10,7 +10,28 @@ import (
 )
 
 // RenderPreview renders the color preview block.
-func RenderPreview(c color.Color, width, height int) string {
+func RenderPreview(original, current color.Color, width, height int) string {
+	if height < 6 {
+		height = 6
+	}
+
+	topH := height / 2
+	bottomH := height - topH
+	if topH < 3 {
+		topH = 3
+		bottomH = height - topH
+	}
+	if bottomH < 3 {
+		bottomH = 3
+		topH = height - bottomH
+	}
+
+	top := renderPreviewSection("Original", original, width, topH)
+	bottom := renderPreviewSection("Edited", current, width, bottomH)
+	return strings.Join([]string{top, bottom}, "\n")
+}
+
+func renderPreviewSection(title string, c color.Color, width, height int) string {
 	hexColor := fmt.Sprintf("#%02X%02X%02X", c.R, c.G, c.B)
 
 	// Compute foreground suggestion via relative luminance.
@@ -28,10 +49,17 @@ func RenderPreview(c color.Color, width, height int) string {
 	hasAlpha := c.A < 0.999
 
 	var rows []string
-	previewRows := height - 1 // leave room for the fg hint line
+	previewRows := height - 2 // leave room for title + fg hint line
 	if previewRows < 1 {
 		previewRows = 1
 	}
+
+	titleStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("255")).
+		Background(lipgloss.Color("238")).
+		Bold(true).
+		Width(width)
+	rows = append(rows, titleStyle.Render(title))
 
 	colorStyle := lipgloss.NewStyle().Background(lipgloss.Color(hexColor))
 	checkerDarkStyle := lipgloss.NewStyle().Background(lipgloss.Color("236"))

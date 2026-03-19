@@ -105,7 +105,7 @@ func (m Model) render() string {
 
 	leftColumn := lipgloss.JoinVertical(lipgloss.Left, editorPanel, formatsPanel)
 
-	previewContent := ui.RenderPreview(m.currentColor, rightW-2, bodyH-2)
+	previewContent := ui.RenderPreview(m.originalColor, m.currentColor, rightW-2, bodyH-2)
 	previewPanel := lipgloss.NewStyle().
 		Border(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("240")).
