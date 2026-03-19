@@ -34,6 +34,10 @@ quit with `q`.
 History is stored locally in `XDG_STATE_HOME/colr/history.json` and keeps the
 last 100 colors, newest first.
 
+If the clipboard or CLI input does not contain any color, `colr` falls back to
+the most recent history entry and shows a toast explaining that startup used
+history instead.
+
 ## Keybindings
 
 | Key            | Action                    |

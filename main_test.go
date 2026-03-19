@@ -3,6 +3,9 @@ package main
 import (
 	"errors"
 	"testing"
+
+	"github.com/elentok/colr/color"
+	"github.com/elentok/colr/history"
 )
 
 func TestResolveInputPrefersArgument(t *testing.T) {
@@ -62,5 +65,51 @@ func TestResolveInputReturnsClipboardError(t *testing.T) {
 	})
 	if !errors.Is(err, wantErr) {
 		t.Fatalf("resolveInput error = %v, want %v", err, wantErr)
+	}
+}
+
+func TestResolveStartupColorUsesParsedInput(t *testing.T) {
+	inputText, got, toast, err := resolveStartupColor("button=#ff0000", []history.Entry{
+		{Original: "#00ff00", Color: color.Color{R: 0, G: 255, B: 0, A: 1}},
+	})
+	if err != nil {
+		t.Fatalf("resolveStartupColor returned error: %v", err)
+	}
+	if inputText != "button=#ff0000" {
+		t.Fatalf("resolveStartupColor inputText = %q, want %q", inputText, "button=#ff0000")
+	}
+	if got != (color.Color{R: 255, G: 0, B: 0, A: 1}) {
+		t.Fatalf("resolveStartupColor color = %+v, want red", got)
+	}
+	if toast != "" {
+		t.Fatalf("resolveStartupColor toast = %q, want empty", toast)
+	}
+}
+
+func TestResolveStartupColorFallsBackToHistory(t *testing.T) {
+	entry := history.Entry{
+		Original: "rgb(0 255 0)",
+		Color:    color.Color{R: 0, G: 255, B: 0, A: 1},
+	}
+
+	inputText, got, toast, err := resolveStartupColor("not a color", []history.Entry{entry})
+	if err != nil {
+		t.Fatalf("resolveStartupColor returned error: %v", err)
+	}
+	if inputText != entry.Original {
+		t.Fatalf("resolveStartupColor inputText = %q, want %q", inputText, entry.Original)
+	}
+	if got != entry.Color {
+		t.Fatalf("resolveStartupColor color = %+v, want %+v", got, entry.Color)
+	}
+	if toast == "" {
+		t.Fatal("resolveStartupColor should return a toast message for history fallback")
+	}
+}
+
+func TestResolveStartupColorErrorsWithoutHistoryFallback(t *testing.T) {
+	_, _, _, err := resolveStartupColor("not a color", nil)
+	if !errors.Is(err, errNoColorAvailable) {
+		t.Fatalf("resolveStartupColor error = %v, want %v", err, errNoColorAvailable)
 	}
 }

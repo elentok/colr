@@ -51,6 +51,11 @@ func (m Model) Init() tea.Cmd {
 	return nil
 }
 
+func (m Model) WithToast(msg string) Model {
+	m.toastMessage = msg
+	return m
+}
+
 func (m Model) HistoryEntriesForSave() []history.Entry {
 	return history.Record(m.historyEntries, m.originalClip, m.currentColor)
 }
