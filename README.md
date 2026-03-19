@@ -49,6 +49,7 @@ history instead.
 | `tab`          | Toggle HSV / RGB mode     |
 | `1` / `2`      | Switch to HSV / RGB mode  |
 | `p`            | Open history selector     |
+| `s`            | Save edited color to history |
 | `yr` / `yy`    | Copy RGB to clipboard     |
 | `yx`           | Copy HEX to clipboard     |
 | `yh`           | Copy HSL to clipboard     |

@@ -12,6 +12,12 @@ import (
 // ClearToastMsg is sent when a toast timer expires.
 type ClearToastMsg struct{}
 
+// SaveHistoryMsg reports the result of an explicit history save.
+type SaveHistoryMsg struct {
+	err     error
+	entries []history.Entry
+}
+
 // Model is the Bubble Tea application model.
 type Model struct {
 	originalClip   string
@@ -69,4 +75,16 @@ func applyHistoryEntry(m Model, entry history.Entry) Model {
 	m.showHistory = false
 	m.pendingY = false
 	return m
+}
+
+func applySaveHistory(m Model) (Model, tea.Cmd) {
+	entries := m.HistoryEntriesForSave()
+
+	return m, func() tea.Msg {
+		err := history.Save(entries)
+		return SaveHistoryMsg{
+			err:     err,
+			entries: entries,
+		}
+	}
 }

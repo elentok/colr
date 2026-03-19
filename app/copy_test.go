@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -235,5 +236,44 @@ func TestHistoryOverlayConsumesEditingKeys(t *testing.T) {
 	}
 	if updated.selectedField != FieldOpacity {
 		t.Errorf("selectedField changed while history open: got %d want %d", updated.selectedField, FieldOpacity)
+	}
+}
+
+func TestSPressesStartsHistorySave(t *testing.T) {
+	m := newTestModel(color.Color{R: 255, G: 0, B: 0, A: 1})
+
+	result, cmd := handleKeyMsg(m, "s")
+	updated := result.(Model)
+	if cmd == nil {
+		t.Fatal("expected save history command from 's'")
+	}
+	if updated.pendingY {
+		t.Fatal("expected pendingY cleared when saving history")
+	}
+}
+
+func TestSaveHistoryMsgUpdatesEntriesAndToast(t *testing.T) {
+	m := newTestModel(color.Color{R: 255, G: 0, B: 0, A: 1})
+	entries := []history.Entry{
+		{Original: "rgb(255 0 0)", Color: color.Color{R: 255, G: 0, B: 0, A: 1}},
+	}
+
+	result, _ := m.Update(SaveHistoryMsg{entries: entries})
+	updated := result.(Model)
+	if len(updated.historyEntries) != 1 {
+		t.Fatalf("historyEntries length = %d, want 1", len(updated.historyEntries))
+	}
+	if updated.toastMessage != "Saved color to history" {
+		t.Fatalf("toastMessage = %q, want %q", updated.toastMessage, "Saved color to history")
+	}
+}
+
+func TestSaveHistoryMsgFailureSetsErrorToast(t *testing.T) {
+	m := newTestModel(color.Color{R: 255, G: 0, B: 0, A: 1})
+
+	result, _ := m.Update(SaveHistoryMsg{err: errors.New("write failed")})
+	updated := result.(Model)
+	if updated.toastMessage != "Failed to save color to history" {
+		t.Fatalf("toastMessage = %q, want %q", updated.toastMessage, "Failed to save color to history")
 	}
 }

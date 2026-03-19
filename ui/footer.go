@@ -10,6 +10,7 @@ func RenderFooter(width int) string {
 		{"H/L", "larger step"},
 		{"tab", "mode"},
 		{"p", "history"},
+		{"s", "save"},
 		{"yr/yx/yh/yn/yy", "copy"},
 		{"R", "reset"},
 		{"?", "help"},

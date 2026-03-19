@@ -53,6 +53,7 @@ func RenderHelp(width, height int) string {
 
 	content += helpSectionStyle.Render("History") + "\n"
 	content += helpRow("p", "open color history")
+	content += helpRow("s", "save edited color to history")
 	content += helpRow("j/k  ↑/↓", "move within history")
 	content += helpRow("enter", "load selected color")
 	content += helpRow("Esc / q / p", "close history")

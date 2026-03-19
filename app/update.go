@@ -17,6 +17,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case ClearToastMsg:
 		m.toastMessage = ""
+
+	case SaveHistoryMsg:
+		if msg.err != nil {
+			m.toastMessage = "Failed to save color to history"
+			return m, nil
+		}
+		m.historyEntries = msg.entries
+		m.historyIndex = 0
+		m.toastMessage = "Saved color to history"
+		return m, nil
 	}
 
 	return m, nil
@@ -59,6 +69,10 @@ func handleKeyMsg(m Model, key string) (tea.Model, tea.Cmd) {
 			m.historyIndex = len(m.historyEntries) - 1
 		}
 		m.showHistory = true
+
+	case "s":
+		m.pendingY = false
+		return applySaveHistory(m)
 
 	default:
 		var cmd tea.Cmd
