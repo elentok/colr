@@ -23,6 +23,7 @@ type Model struct {
 	originalClip   string
 	originalColor  color.Color
 	currentColor   color.Color
+	previewDarkBG  bool
 	editMode       EditMode
 	selectedField  int
 	lastHue        float64 // preserved hue for grayscale stability

@@ -19,6 +19,7 @@ func TestApplyCopyToastMessages(t *testing.T) {
 		{"rgb", "RGB"},
 		{"hex", "HEX"},
 		{"hsl", "HSL"},
+		{"over", "Over-bg"},
 	}
 
 	for _, tc := range tests {
@@ -99,6 +100,18 @@ func TestYPrefixCopyHSL(t *testing.T) {
 	updated := result.(Model)
 	if !strings.Contains(updated.toastMessage, "HSL") {
 		t.Errorf("expected HSL toast, got %q", updated.toastMessage)
+	}
+}
+
+func TestYPrefixCopyOverBackgroundHEX(t *testing.T) {
+	m := newTestModel(color.Color{R: 255, G: 0, B: 0, A: 0.5})
+	m.previewDarkBG = true
+	m.pendingY = true
+
+	result, _ := handleKeyMsg(m, "o")
+	updated := result.(Model)
+	if !strings.Contains(updated.toastMessage, "Over-bg") {
+		t.Errorf("expected Over-bg toast, got %q", updated.toastMessage)
 	}
 }
 
@@ -188,6 +201,28 @@ func TestHelpBlocksOtherKeys(t *testing.T) {
 	updated := result.(Model)
 	if updated.selectedField != original {
 		t.Errorf("expected field unchanged while help open, got %d", updated.selectedField)
+	}
+}
+
+func TestBTogglesPreviewBackground(t *testing.T) {
+	m := newTestModel(color.Color{R: 255, G: 0, B: 0, A: 1})
+
+	result, _ := handleKeyMsg(m, "b")
+	updated := result.(Model)
+	if !updated.previewDarkBG {
+		t.Fatal("expected previewDarkBG=true after first b")
+	}
+	if updated.toastMessage != "Preview background: black" {
+		t.Fatalf("toastMessage = %q, want %q", updated.toastMessage, "Preview background: black")
+	}
+
+	result2, _ := handleKeyMsg(updated, "b")
+	updated2 := result2.(Model)
+	if updated2.previewDarkBG {
+		t.Fatal("expected previewDarkBG=false after second b")
+	}
+	if updated2.toastMessage != "Preview background: white" {
+		t.Fatalf("toastMessage = %q, want %q", updated2.toastMessage, "Preview background: white")
 	}
 }
 

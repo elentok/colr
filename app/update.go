@@ -96,6 +96,8 @@ func handleEditKey(m Model, key string) (Model, tea.Cmd) {
 			return applyCopy(m, "hsl")
 		case "n":
 			return applyCopy(m, "name")
+		case "o":
+			return applyCopy(m, "over")
 		case "y":
 			return applyCopy(m, "rgb")
 		}
@@ -151,6 +153,11 @@ func handleKey(m Model, key string) Model {
 	// Reset
 	case "R":
 		m = applyReset(m)
+
+	// Preview background
+	case "b":
+		m.previewDarkBG = !m.previewDarkBG
+		m.toastMessage = "Preview background: " + previewBackgroundName(m.previewDarkBG)
 	}
 
 	return m

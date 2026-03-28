@@ -30,7 +30,8 @@ colr "button=rgb(255 128 0); border=#112233"
 
 The app reads your clipboard on launch, searches the provided text for the
 first valid CSS color, and opens a TUI showing a live preview, an editor, and
-output formats. When you're done, copy the result with `yr`, `yx`, or `yh` and
+output formats. When you're done, copy the result with `yr`, `yx`, `yh`, or
+`yo` and
 quit with `q`. Press `s` at any time to save the current edited color to
 history immediately.
 
@@ -51,11 +52,13 @@ history instead.
 | `g` / `G`      | First / last field        |
 | `tab`          | Toggle HSV / RGB mode     |
 | `1` / `2`      | Switch to HSV / RGB mode  |
+| `b`            | Toggle preview bg (white/black) |
 | `p`            | Open history selector     |
 | `s`            | Save edited color to history |
 | `yr` / `yy`    | Copy RGB to clipboard     |
 | `yx`           | Copy HEX to clipboard     |
 | `yh`           | Copy HSL to clipboard     |
+| `yo`           | Copy composited over-bg HEX |
 | `yn`           | Copy CSS name to clipboard |
 | `R`            | Reset to original color   |
 | `?`            | Help overlay              |
@@ -81,6 +84,7 @@ Channel values accept integers (0–255) or percentages. Alpha accepts a decimal
 | `yr` / `yy` | RGB    | `rgb(255 128 0)` / `rgb(255 128 0 / 50%)`     |
 | `yx`        | HEX    | `#ff8000` / `#ff800080`                       |
 | `yh`        | HSL    | `hsl(30 100% 50%)` / `hsl(30 100% 50% / 50%)` |
+| `yo`        | Over-bg HEX | `#bf4000` (based on current preview bg) |
 
 Alpha is omitted when 100%, included as an integer percentage otherwise.
 

@@ -48,6 +48,7 @@ func RenderHelp(width, height int) string {
 	content += helpRow("yr / yy", "copy RGB")
 	content += helpRow("yx", "copy HEX")
 	content += helpRow("yh", "copy HSL")
+	content += helpRow("yo", "copy over-bg HEX")
 	content += helpRow("yn", "copy CSS name")
 	content += "\n"
 
@@ -60,6 +61,7 @@ func RenderHelp(width, height int) string {
 	content += "\n"
 
 	content += helpSectionStyle.Render("Other") + "\n"
+	content += helpRow("b", "toggle preview bg")
 	content += helpRow("R", "reset color")
 	content += helpRow("?  Esc  q", "close this help")
 	content += helpRow("ctrl+c", "quit")

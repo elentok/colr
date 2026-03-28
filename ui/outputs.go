@@ -9,12 +9,17 @@ import (
 )
 
 // RenderOutputs renders the RGB/HEX/HSL output rows.
-func RenderOutputs(c color.Color, width int) string {
+func RenderOutputs(c, previewBG color.Color, width int) string {
 	rgb := color.FormatRGB(c)
 	hex := color.FormatHEX(c)
 	hsl := color.FormatHSL(c)
+	overBG := color.FormatHEX(color.CompositeOver(c, previewBG))
 
 	name := color.NearestNamedColor(c)
+	bgName := "white"
+	if previewBG.R == 0 && previewBG.G == 0 && previewBG.B == 0 {
+		bgName = "black"
+	}
 
 	rows := []struct {
 		label string
@@ -24,6 +29,7 @@ func RenderOutputs(c color.Color, width int) string {
 		{"RGB", rgb, "[yr]"},
 		{"HEX", hex, "[yx]"},
 		{"HSL", hsl, "[yh]"},
+		{"OVER", overBG + " on " + bgName, "[yo]"},
 		{"NAME", name, "[yn]"},
 	}
 

@@ -12,7 +12,7 @@ import (
 )
 
 // applyCopy writes the requested format to the clipboard and sets a toast.
-// format must be "rgb", "hex", or "hsl".
+// format must be "rgb", "hex", "hsl", "name", or "over".
 func applyCopy(m Model, format string) (Model, tea.Cmd) {
 	var text, label string
 	switch format {
@@ -28,6 +28,10 @@ func applyCopy(m Model, format string) (Model, tea.Cmd) {
 	case "name":
 		text = strings.TrimPrefix(color.NearestNamedColor(m.currentColor), "~")
 		label = "Name"
+	case "over":
+		bg := previewBackgroundColor(m.previewDarkBG)
+		text = color.FormatHEX(color.CompositeOver(m.currentColor, bg))
+		label = "Over-bg"
 	}
 
 	err := clipboard.Write(text)

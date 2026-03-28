@@ -17,15 +17,15 @@ const (
 )
 
 // RenderPreview renders the color preview block.
-func RenderPreview(original, current color.Color, width, height int, layout PreviewLayout) string {
+func RenderPreview(original, current, previewBG color.Color, width, height int, layout PreviewLayout) string {
 	if layout == PreviewSideBySide {
-		return renderPreviewSideBySide(original, current, width, height)
+		return renderPreviewSideBySide(original, current, previewBG, width, height)
 	}
 
-	return renderPreviewStacked(original, current, width, height)
+	return renderPreviewStacked(original, current, previewBG, width, height)
 }
 
-func renderPreviewStacked(original, current color.Color, width, height int) string {
+func renderPreviewStacked(original, current, previewBG color.Color, width, height int) string {
 	if height < 6 {
 		height = 6
 	}
@@ -41,12 +41,12 @@ func renderPreviewStacked(original, current color.Color, width, height int) stri
 		topH = height - bottomH
 	}
 
-	top := renderPreviewSection("Original", original, width, topH)
-	bottom := renderPreviewSection("Edited", current, width, bottomH)
+	top := renderPreviewSection("Original", original, previewBG, width, topH)
+	bottom := renderPreviewSection("Edited", current, previewBG, width, bottomH)
 	return strings.Join([]string{top, bottom}, "\n")
 }
 
-func renderPreviewSideBySide(original, current color.Color, width, height int) string {
+func renderPreviewSideBySide(original, current, previewBG color.Color, width, height int) string {
 	if width < 20 {
 		width = 20
 	}
@@ -65,27 +65,32 @@ func renderPreviewSideBySide(original, current color.Color, width, height int) s
 		leftW = width - rightW
 	}
 
-	left := renderPreviewSection("Original", original, leftW, height)
-	right := renderPreviewSection("Edited", current, rightW, height)
+	left := renderPreviewSection("Original", original, previewBG, leftW, height)
+	right := renderPreviewSection("Edited", current, previewBG, rightW, height)
 	return lipgloss.JoinHorizontal(lipgloss.Top, left, right)
 }
 
-func renderPreviewSection(title string, c color.Color, width, height int) string {
-	hexColor := fmt.Sprintf("#%02x%02x%02x", c.R, c.G, c.B)
+func renderPreviewSection(title string, c, previewBG color.Color, width, height int) string {
+	rawHex := color.FormatHEX(c)
+	overBG := color.CompositeOver(c, previewBG)
+	overHex := color.FormatHEX(overBG)
+	overBGHex := fmt.Sprintf("#%02x%02x%02x", overBG.R, overBG.G, overBG.B)
+	previewBGHex := fmt.Sprintf("#%02x%02x%02x", previewBG.R, previewBG.G, previewBG.B)
 
-	// Compute foreground suggestion via relative luminance.
-	r := float64(c.R) / 255.0
-	g := float64(c.G) / 255.0
-	b := float64(c.B) / 255.0
+	// Compute foreground suggestion via relative luminance for composited color.
+	r := float64(overBG.R) / 255.0
+	g := float64(overBG.G) / 255.0
+	b := float64(overBG.B) / 255.0
 	luminance := 0.2126*r + 0.7152*g + 0.0722*b
-	fgSuggestion := "white"
 	fgANSI := lipgloss.Color("255")
 	if luminance > 0.5 {
-		fgSuggestion = "black"
 		fgANSI = lipgloss.Color("0")
 	}
 
-	hasAlpha := c.A < 0.999
+	bgName := "white"
+	if previewBG.R == 0 && previewBG.G == 0 && previewBG.B == 0 {
+		bgName = "black"
+	}
 
 	var rows []string
 	previewRows := height - 2 // leave room for title + fg hint line
@@ -100,53 +105,45 @@ func renderPreviewSection(title string, c color.Color, width, height int) string
 		Width(width)
 	rows = append(rows, titleStyle.Render(title))
 
-	colorStyle := lipgloss.NewStyle().Background(lipgloss.Color(hexColor))
-	checkerDarkStyle := lipgloss.NewStyle().Background(lipgloss.Color("236"))
-	checkerLightStyle := lipgloss.NewStyle().Background(lipgloss.Color("250"))
+	bgStyle := lipgloss.NewStyle().Background(lipgloss.Color(previewBGHex))
+	overStyle := lipgloss.NewStyle().Background(lipgloss.Color(overBGHex))
+	innerW := width - 2
+	if innerW < 0 {
+		innerW = 0
+	}
 
-	blockW := 2
-	line := strings.Repeat(" ", width)
-
-	for i := range previewRows {
-		if hasAlpha {
-			// Per-cell compositing: alternate color/checker blocks within each row.
-			var cells []string
-			col := 0
-			for col < width {
-				end := col + blockW
-				if end > width {
-					end = width
-				}
-				chunk := strings.Repeat(" ", end-col)
-				// Alternate between color and checker based on position + row parity.
-				block := (col/blockW + i) % 2
-				if block == 0 {
-					cells = append(cells, colorStyle.Render(chunk))
-				} else {
-					if (i/2)%2 == 0 {
-						cells = append(cells, checkerDarkStyle.Render(chunk))
-					} else {
-						cells = append(cells, checkerLightStyle.Render(chunk))
-					}
-				}
-				col = end
-			}
-			rows = append(rows, strings.Join(cells, ""))
-		} else {
-			rows = append(rows, colorStyle.Render(line))
+	for range previewRows {
+		switch {
+		case width <= 0:
+			rows = append(rows, "")
+		case width == 1:
+			rows = append(rows, bgStyle.Render(" "))
+		default:
+			row := bgStyle.Render(" ") + overStyle.Render(strings.Repeat(" ", innerW)) + bgStyle.Render(" ")
+			rows = append(rows, row)
 		}
 	}
 
-	// Foreground hint line at bottom: styled with actual fg/bg colors.
-	fgHint := fmt.Sprintf("Foreground: %s", fgSuggestion)
-	if hasAlpha {
-		fgHint += " (transparent)"
-	}
+	// Bottom line shows raw and composited values.
+	fgHint := previewInfoLine(width, rawHex, overHex, bgName)
 	hintStyle := lipgloss.NewStyle().
 		Foreground(fgANSI).
-		Background(lipgloss.Color(hexColor)).
+		Background(lipgloss.Color(overBGHex)).
 		Width(width)
 	rows = append(rows, hintStyle.Render(fgHint))
 
 	return strings.Join(rows, "\n")
+}
+
+func previewInfoLine(width int, rawHex, overHex, bgName string) string {
+	switch {
+	case width >= 44:
+		return fmt.Sprintf("raw %s  over-bg %s  bg %s", rawHex, overHex, bgName)
+	case width >= 20:
+		return fmt.Sprintf("over-bg %s  bg %s", overHex, bgName)
+	case width >= 16:
+		return fmt.Sprintf("over %s", overHex)
+	default:
+		return overHex
+	}
 }

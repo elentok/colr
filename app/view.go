@@ -32,9 +32,11 @@ func (m Model) render() string {
 
 	const (
 		headerPanelH  = 5
-		outputsPanelH = 6
+		outputsPanelH = 7
 		footerH       = 1
 	)
+
+	previewBG := previewBackgroundColor(m.previewDarkBG)
 
 	bodyH := totalH - headerPanelH - footerH
 	if bodyH < 8 {
@@ -86,7 +88,7 @@ func (m Model) render() string {
 			Height(editorPanelH).
 			Render(editorContent)
 
-		formatsContent := ui.RenderOutputs(m.currentColor, totalW-2)
+		formatsContent := ui.RenderOutputs(m.currentColor, previewBG, totalW-2)
 		formatsPanel := lipgloss.NewStyle().
 			Border(lipgloss.NormalBorder()).
 			BorderForeground(lipgloss.Color("240")).
@@ -94,7 +96,7 @@ func (m Model) render() string {
 			Height(formatsPanelH).
 			Render(formatsContent)
 
-		previewContent := ui.RenderPreview(m.originalColor, m.currentColor, totalW-2, previewPanelH-2, ui.PreviewSideBySide)
+		previewContent := ui.RenderPreview(m.originalColor, m.currentColor, previewBG, totalW-2, previewPanelH-2, ui.PreviewSideBySide)
 		previewPanel := lipgloss.NewStyle().
 			Border(lipgloss.NormalBorder()).
 			BorderForeground(lipgloss.Color("240")).
@@ -147,7 +149,7 @@ func (m Model) render() string {
 		Height(editorPanelH).
 		Render(editorContent)
 
-	formatsContent := ui.RenderOutputs(m.currentColor, leftW-2)
+	formatsContent := ui.RenderOutputs(m.currentColor, previewBG, leftW-2)
 	formatsPanel := lipgloss.NewStyle().
 		Border(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("240")).
@@ -157,7 +159,7 @@ func (m Model) render() string {
 
 	leftColumn := lipgloss.JoinVertical(lipgloss.Left, editorPanel, formatsPanel)
 
-	previewContent := ui.RenderPreview(m.originalColor, m.currentColor, rightW-2, bodyH-2, ui.PreviewStacked)
+	previewContent := ui.RenderPreview(m.originalColor, m.currentColor, previewBG, rightW-2, bodyH-2, ui.PreviewStacked)
 	previewPanel := lipgloss.NewStyle().
 		Border(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("240")).
