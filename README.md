@@ -30,9 +30,8 @@ colr "button=rgb(255 128 0); border=#112233"
 
 The app reads your clipboard on launch, searches the provided text for the
 first valid CSS color, and opens a TUI showing a live preview, an editor, and
-output formats. When you're done, copy the result with `yr`, `yx`, `yh`, or
-`yo` and
-quit with `q`. Press `s` at any time to save the current edited color to
+output formats. When you're done, copy the result with `yr`, `yx`, `yh`, or `yo`
+and quit with `q`. Press `s` at any time to save the current edited color to
 history immediately.
 
 History is stored locally in `XDG_STATE_HOME/colr/history.json` and keeps the
@@ -112,3 +111,11 @@ go build -o colr .
 ```
 
 **Requirements:** Go 1.25+, a terminal with 256-color support.
+
+## Development
+
+Run the full test suite:
+
+```sh
+make test
+```
