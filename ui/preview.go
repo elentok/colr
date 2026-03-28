@@ -107,10 +107,7 @@ func renderPreviewSection(title string, c, previewBG color.Color, width, height 
 
 	bgStyle := lipgloss.NewStyle().Background(lipgloss.Color(previewBGHex))
 	overStyle := lipgloss.NewStyle().Background(lipgloss.Color(overBGHex))
-	innerW := width - 2
-	if innerW < 0 {
-		innerW = 0
-	}
+	innerW := max(width-2, 0)
 
 	for range previewRows {
 		switch {
